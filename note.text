@@ -1,1 +1,0 @@
-sudo apt install build-essential libgl1-mesa-dev pkg-config libcairo2-dev gcc python3-dev libgirepository1.0-dev
