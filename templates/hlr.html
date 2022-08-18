@@ -1,0 +1,223 @@
+{% extends "base.html" %} {% load static %} 
+
+{% block content %}
+<section class="box section" id="box" style="padding-bottom:1.5rem">
+  <div class="profile_box_container container grid">
+    <!--========== Box 1 ==========-->
+    <div class="box_content analytics_datatable-container" id="subscribers-box1">
+      <script>
+        window.addEventListener('resize', function() {
+            $("#subscribers-box1").width("100%");
+          });
+        $("#subscribers-box1").width($("#subscribers-box1").width());
+      </script>
+      <div class="box_bg"></div>
+      <div class="analytics-table-container">
+        <div class="device_information">
+        <h2 class="device_table_title ">Subscribers</h2>
+        </div>
+      <table id="device-datatable" class="display nowrap" style="wide:100%"></table></div>
+    </div>
+    <!--========== Box 2 ==========-->
+    <div class="box_content " id="subscribers-box2" style="padding-bottom:2rem">
+      <div class="box_bg"></div>
+      <div id="subscriber-info-hider">
+        <i class="uil uil-users-alt" style="font-size: 20rem;"></i>
+        <h1>Click any subscriber id to get detail information</h1>
+      </div>
+        <div id="subscriber-info" style="display:none">
+          <form id="subscriber-info-update-form" action="{% url 'ajax_subscriber_update' %}" method="post">
+          <div class="box_header" style="justify-content: center;">
+            <i class="uil uil-user box_icon"></i>
+            <h3 class="box_title"> Subscriber</h3>
+            {% csrf_token %}
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">ID :</p>
+            <p id="subscriber-id" class="box_subtitle"></p>
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">IMSI :</p>
+            <p id="subscriber-imsi" class="box_subtitle"></p>
+            <input type="hidden" id="subscriber-imsi-val" name="imsi">
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">IMEI : </p>
+            <input type="text" class="user_input-subscriber" id="subscriber-imei" placeholder=" Enter IMEI Number" name="imei">
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">MSISDN :</p>
+            <input type="text" class="user_input-subscriber" id="subscriber-msisdn" placeholder=" Enter MSISDN Number" name="msisdn">
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">VLR number :</p>
+            <p id="subscriber-vlr" class="box_subtitle"></p>
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">last LU seen on CS :</p>
+            <p id="subscriber-luoncs" class="box_subtitle"></p>
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">2G auth :</p>
+            <select name="aud2g" class="custom-select" id="subscriber-2g" style="display: none;">
+              <option value="none">none</option>
+              <option value="comp128v1">comp128v1</option>
+              <option value="comp128v2">comp128v2</option>
+              <option value="comp128v3">comp128v3</option>
+              <option value="xor">xor</option>
+            </select>
+          </div>
+          <div class="box_subtitle-gap" id ="subscriber-2g-ki-box">
+            <p class="box_subtitle">KI :</p>
+            <input type="text" class="user_input-subscriber" id="subscriber-2g-ki" placeholder=" Enter KI Number" name="ki">
+          </div>
+          <div class="box_subtitle-gap">
+            <p class="box_subtitle">3G auth :</p>
+            <select name="aud3g" class="custom-select" id="subscriber-3g" style="display: none;">
+              <option value="none">none</option>
+              <option value="milenage">milenage</option>
+              <option value="xor">xor</option>
+            </select>
+          </div>
+          <div class="box_subtitle-gap" id="subscriber-3g-k-box">
+            <p class="box_subtitle">K :</p>
+            <input type="text" class="user_input-subscriber" id="subscriber-3g-k" placeholder=" Enter K Number" name="k">
+          </div>
+          <div class="box_subtitle-gap" id="subscriber-3g-op-box">
+            <p class="box_subtitle">OP :</p>
+            <input type="text" class="user_input-subscriber" id="subscriber-3g-op" placeholder=" Enter OP Number" name="op">
+          </div>
+          <div class="box_subtitle-gap" id="subscriber-3g-opc-box">
+            <p class="box_subtitle">OPC :</p>
+            <input type="text" class="user_input-subscriber" id="subscriber-3g-opc" placeholder=" Enter OPC Number" name="opc">
+          </div>
+          <div class="box_subtitle-gap" id="subscriber-3g-ind-box">
+            <p class="box_subtitle">IND-bitlen :</p>
+            <p id="subscriber-3g-ind" class="box_subtitle"></p>
+          </div>
+          <button
+                type="submit"
+                class="button button--flex user_button"
+                style="justify-content: center; align-items: center; width: 100%; position: absolute; bottom: -1.5rem; left:0px;"
+              >
+                Update
+                <i class="uil uil-update button_icon"></i>
+          </button>
+          </form>
+        </div>
+    </div>
+    <!--========== Box 3 ==========-->
+    <div class="box_content" id="subscribers-box3" style="padding:0;max-height:5rem">
+      <div class="box_bg"></div>
+      <button
+      type="submit"
+      class="button button--flex user_button pop" name="add_device"
+      style="justify-content: center; align-items: center; width: 100%; height:100%;"
+      >
+        Add Subscriber
+        <i class="uil uil-update button_icon"></i>
+      </button>
+    </div>
+    <!--========== Box 4 ==========-->
+    <div class="box_content" id="subscribers-box4" style="padding:0;max-height:5rem">
+      <div class="box_bg"></div>
+      <button
+      type="submit"
+      class="button button--flex user_button pop" name="remove_device"
+      style="justify-content: center; align-items: center; width: 100%; height:100%;"
+      >
+      Remove Subscriber
+      <i class="uil uil-update button_icon"></i>
+    </button>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+{% block box_model %}{% endblock box_model %}
+{% block popup %}
+<div class="popup_content add_device" id="add-device" >
+  <div class="popup_box">
+    <div class="popup_box container grid">
+      <div class="popup_box-content" id="add-device-box1">
+        <div class="popup_bg"></div>
+        <div class="popup-container">
+          <h2 class="popup_title">Add Subscriber</h2>
+          <div class="user_container container grid" >
+            <form
+              id="add-device-form"
+              class="user_form grid"
+              method="POST"
+              enctype="multipart/form-data"
+              >
+              {% csrf_token %}
+              <div class="user_content">
+                <label class="user_label"
+                  > Subscriber IMSI
+                  </label>
+                  <input type="text" class="user_input" placeholder="Enter IMSI Number" name="imsi" required>
+              </div>
+              <div class="user_content">
+                <label class="user_label"
+                  > Subscriber MSISDN
+                  </label>
+                  <input type="text" class="user_input" placeholder="Enter MSISDN Number" name="msisdn">
+              </div>
+              <button
+                type="submit"
+                class="button button--flex user_button"
+                style="justify-content: center; align-items: center"
+              >
+                Submit
+                <i class="uil uil-update button_icon"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="popup_content remove_device" id="remove-device" >
+  <div class="popup_box">
+    <div class="popup_box container grid">
+      <div class="popup_box-content" id="remove-device-box1">
+        <div class="popup_bg"></div>
+        <div class="popup-container">
+          <h2 class="popup_title">Remove Subscriber</h2>
+          <div class="user_container container grid" >
+            <form
+              id="remove-device-form"
+              class="user_form grid"
+              method="POST"
+              enctype="multipart/form-data"
+              >
+              {% csrf_token %}
+              <div class="user_content">
+                <label class="user_label" for="id_device_remove"
+                  >IMSI</label
+                >
+                <input type="text" name="imsi" class="user_input" placeholder="Enter the device id that you want to remove" required="" id="id_device_remove">
+              </div>
+              <p class="user_subtitle">
+                Please note that if you remove a subscriber, he will no longer be able to access any services.
+              </p>
+              <button
+                type="submit"
+                class="button button--flex user_button"
+                style="justify-content: center; align-items: center"
+              >
+               Yes, I want to remove this subscriber
+                <i class="uil uil-update button_icon"></i>
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock popup %}
+{% block scripts %}
+<script src="{% static 'js/moment.min.js' %}"></script>
+<script src="{% static 'js/hlr/subscribers.min.js' %}"></script>
+{% endblock scripts %}

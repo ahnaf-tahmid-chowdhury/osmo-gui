@@ -1,0 +1,192 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" oncontextmenu="return false">
+  <head>
+    {% if title %}
+      <title>{{ title }}</title>
+    {% else %}
+      <title>Osmocom</title>
+    {% endif %}
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <!--========== UNICONS ==========-->
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css"/>
+    <!--========== Logo ==========-->
+    <link rel="icon" href="{% static 'images/osmocom_icon.svg'%}"/>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+    <!--========== Script ==========-->
+    <script src="{% static 'js/jquery-3.6.0.min.js' %}"></script>
+    {% block header %}{% endblock header %}
+    <!--========== CSS ==========-->
+    <link rel="stylesheet" href="{% static 'datatables/datatables.min.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
+  </head>
+
+  <body onload="PreLoad()" id="body">
+    <!--========== Preloader ==========-->
+    <div id="loading">
+      <img class="load_tahmid" src= "{% static 'images/Osmocom_logo.svg' %}">
+    </div>
+
+    <!--========== Header ==========-->
+    <header class="header" id="header">
+      <div class="header_bg" id="header-bg"></div>
+      <nav class="nav-mobile container">
+        <a href="" class="nav_logo-mobile">
+          Osmocom
+          {% if sub_title %}|
+            {{sub_title}}
+          {% endif %}
+        </a>
+        <div class="nav_menu-mobile" id="nav-menu-mobile">
+          <ul class="nav_list-mobile grid">
+            <div></div>
+            <div></div>
+            <h3 class="sidebar_subtitle-mobile">Osmocom</h3>
+            <div></div>
+            <div></div>
+            <div></div>
+            <li class="nav_item-mobile">
+              <a href="{% url 'hlr' %}" class="nav_link-mobile {% if view.template_name == 'hlr.html' %} active {% endif %}">
+                <i class="uil uil-users-alt nav_icon-mobile"></i>HLR
+              </a>
+            </li>
+            <div></div>
+            <div></div>
+            {% block navbar %}{% endblock navbar %}
+              <li class="nav_item-mobile">
+                <a href="#" class="nav_link-mobile pop" name="preferences">
+                  <i class="uil uil-setting nav_icon-mobile"></i>Preferences
+                </a>
+              </li>
+            <div></div>
+            <div></div><div></div>
+            </li>
+          </ul>
+
+          <i class="uil uil-times nav_close-mobile" id="nav-close-mobile"></i>
+        </div>
+        <div class="nav_btns">
+          <div class="nav_toggle-mobile" id="nav-toggle-mobile">
+            <i class="uil uil-apps"></i>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!--========== Main ==========-->
+    <main class="main">
+      <!--========== Sidebar ==========-->
+      <div class="sidebar" id="sidebar">
+        <nav class="sidebar_container">
+          <div>
+            <a href="" class="sidebar_link sidebar_logo">
+              <img src="{% static 'images/osmocom_icon.svg' %}" class="logo_img"/>
+              <span class="sidebar_logo-name">Osmocom</span>
+            </a>
+            <div class="sidebar_list">
+              <div class="sidebar_items">
+                <h3 class="sidebar_subtitle">Dashboard</h3>
+
+                <a href="{% url 'hlr' %}" class="sidebar_link {% if view.template_name == 'hlr.html' %} active {% endif %}">
+                  <i class="uil   uil-users-alt sidebar_icon"></i>
+                  <span class="sidebar_name">HLR</span>
+                </a>
+
+              </div>
+
+              <div class="sidebar_items">
+                <h3 class="sidebar_subtitle">Setup</h3>
+                  {% block sidebar %}{% endblock sidebar %}
+                <a href="#" class="sidebar_link pop" name="preferences">
+                  <i class="uil uil-setting sidebar_icon"></i>
+                  <span class="sidebar_name">Preferences</span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </nav>
+      </div>
+      <!--========== Content ==========-->
+      <div id="content" class="content">
+        <h2 class="section_title">
+          {% if sub_title %}{{sub_title}}
+          {% endif %}
+        </h2>
+        {% block content %}{% endblock content %}
+        <!--========== Box model ==========-->
+        <div class="box_model" id="box-model">
+          {% block box_model %}{% endblock box_model %}
+        </div>
+      </div>
+      <div class="popup" id="popup">
+        {% block popup %}{% endblock popup %}
+        <div class="popup_content preferences" id="preferences">
+          <div class="popup_box container grid">
+            <div class="popup_box-content" id="pop_c1">
+              <div class="popup_bg"></div>
+              <div class="popup-container">
+                <h2 class="popup_title">Themes</h2>
+                <div class="nav_btns flex space-between">
+                  <h3 class="theme-mood">Set mood</h3>
+                  <i class="uil uil-moon change-theme" id="theme-button">
+                    <span class="theme-name">Dark</span>
+                  </i>
+                </div>
+                <div class="theme-colors flex space-between">
+                  <h3 class="theme-mood">Set Color</h3>
+                  <div>
+                    <div class="color" style="background: hsl(5, 69%, 61%)" hue-color="5" red="224" green="98" blue="87" particle-color="#e06257,#cb4e43,#fcbbb6" svg-color="invert(79%) sepia(60%) saturate(7217%) hue-rotate(328deg) brightness(96%) contrast(82%)"></div>
+                    <div class="color" style="background: hsl(25, 69%, 61%)" hue-color="25" red="224" green="144" blue="87" particle-color="#e09057,#cb7c43,#fcd3b6" svg-color="invert(63%) sepia(49%) saturate(492%) hue-rotate(341deg) brightness(90%) contrast(94%)"></div>
+                    <div class="color" style="background: hsl(140, 69%, 61%)" hue-color="140" red="87" green="224" blue="133" particle-color="#57e085,#43cb70,#b6fccd" svg-color="invert(73%) sepia(33%) saturate(713%) hue-rotate(86deg) brightness(99%) contrast(88%)"></div>
+                    <div class="color" style="background: hsl(190, 69%, 61%)" hue-color="200" red="87" green="201" blue="224" particle-color="#57c9e0,#439ecb,#b6f0fc" svg-color="invert(72%) sepia(54%) saturate(429%) hue-rotate(146deg) brightness(90%) contrast(95%)"></div>
+                    <div class="color" style="background: hsl(255, 69%, 61%)" hue-color="255" red="121" green="87" blue="224" particle-color="#7957e0,#6543cb,#c7b6fc" svg-color="invert(55%) sepia(97%) saturate(5013%) hue-rotate(236deg) brightness(91%) contrast(93%)"></div>
+                    <div class="color" style="background: hsl(300, 69%, 61%)" hue-color="300" red="224" green="87" blue="224" particle-color="#e057e0,#cb43cb,#fcb6fc" svg-color="invert(58%) sepia(31%) saturate(4595%) hue-rotate(267deg) brightness(90%) contrast(95%)"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="popup_box-content" id="pop_c2">
+              <div class="popup_bg"></div>
+              <div class="popup-container">
+                <h2 class="popup_title">Animations</h2>
+                <div class="flex space-between">
+                  <h3 class="theme-mood">ParticlesJS</h3>
+                  <label class="switch">
+                    <input class="ParticlesJS" type="checkbox"/>
+                    <span></span>
+                  </label>
+                </div>
+                <div class="flex space-between">
+                  <h3 class="theme-mood">Scroll Reveal</h3>
+                  <label class="switch">
+                    <input class="Reveal" type="checkbox"/>
+                    <span></span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div id="particles-js"></div>
+    <!--========== Scroll Up ==========-->
+    <a href="#" class="scroll_up" id="scroll-up">
+      <i class="uil uil-arrow-up scroll_up-icon"></i>
+    </a>
+    <!--========== JS ==========-->
+      <script>
+        var UserAuthenticated = false;
+      </script>
+    <script src="{% static 'js/scrollreveal.min.js' %}"></script>
+    <script src="{% static 'js/particles.min.js' %}"></script>
+    <script src="{% static 'js/index.var.js' %}"></script>
+    <script src="{% static 'js/jquery.contextMenu.min.js' %}"></script>
+    <script src="{% static 'js/jquery.ui.position.min.js' %}"></script>
+    <script src="{% static 'datatables/datatables.min.js' %}"></script>
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block scripts %}{% endblock scripts %}
+  </body>
+
+</html>
