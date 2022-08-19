@@ -1,5 +1,7 @@
 #!/bin/bash
 
+arguments=$@
+
 unknown_os ()
 {
   echo "Unfortunately, your operating system distribution and version are not supported by this script."
@@ -55,8 +57,8 @@ detect_os ()
   fi
 
   # remove whitespace from OS and dist name
-  os="${os// /}" | tr "[:upper:]" "[:lower:]"
-  dist="${dist// /}" | tr "[:upper:]" "[:lower:]"
+  os="${os// /}" 
+  dist="${dist// /}"
 
   echo "Detected operating system as $os/$dist."
 }
@@ -94,6 +96,7 @@ get_sudo_password ()
 
 setup_dependencies ()
 {
+  echo
   echo "Installing dependencies..."
   if [ "${os,,}" = "arch" ]; then
     sudo pacman -S --noconfirm --needed build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev
@@ -111,22 +114,34 @@ setup_dependencies ()
   echo
 }
 
-create_python_env () {
+setup_python_env () {
+  echo
   if [ -d "${working_dir}/.env" ]; then
     echo "Virtual environment already exists. Deleting..."
     rm -rf "${working_dir}/.env"
   fi
-  echo
   echo "Creating Python virtual env in ${working_dir}/.env"
   /usr/bin/python3 -m venv $working_dir/.env
   source $working_dir/.env/bin/activate
   python3 -m pip install -r $working_dir/requirements.txt
   echo "Python virtual env created."
+}
+setup_python_env_no_gui () {
   echo
+  if [ -d "${working_dir}/.env" ]; then
+    echo "Virtual environment already exists. Deleting..."
+    rm -rf "${working_dir}/.env"
+  fi
+  echo "Creating Python virtual env in ${working_dir}/.env"
+  /usr/bin/python3 -m venv $working_dir/.env
+  source $working_dir/.env/bin/activate
+  python3 -m pip install django 
+  echo "Python virtual env created."
 }
 
 create_desktop_file ()
 {
+  echo
   if [ -f "/usr/share/applications/osmo-gui.desktop" ]; then
     echo "Desktop file already exists. Deleting..."
     sudo rm -f "/usr/share/applications/osmo-gui.desktop"
@@ -150,11 +165,11 @@ EOF
   sudo cp $working_dir/osmo-gui.desktop /usr/share/applications/osmo-gui.desktop
   rm $working_dir/osmo-gui.desktop
   echo "Desktop file created."
-  echo
 }
 
 create_program_file ()
 {
+  echo
   echo "Creating program..."
   if [ -f "${working_dir}/osmo-gui" ]; then
     rm "${working_dir}/osmo-gui"
@@ -185,7 +200,6 @@ if __name__ == "__main__":
 EOF
   chmod +x ${working_dir}/osmo-gui
   echo "osmo-gui created."
-  echo
 }
 
 create_shortcut ()
@@ -198,7 +212,6 @@ create_shortcut ()
   fi
   sudo ln -s ${working_dir}/osmo-gui /usr/bin/osmo-gui
   echo "Shortcut created."
-  echo
 }
 
 main ()
@@ -214,15 +227,38 @@ main ()
   echo "Press enter to continue or ctrl+c to exit."
   read -r
   get_sudo_password
-  setup_dependencies
-  echo "-----------------------------------------------------"
-  create_python_env
-  echo "-----------------------------------------------------"
-  create_program_file
-  create_desktop_file
-  create_shortcut
-  echo "-----------------------------------------------------"
-  echo "Ready to go!"
-  echo "To start the program, run 'osmo-gui'"
+  if [ $arguments = "--no-gui" ]; then
+    echo "Installing without GUI..."
+    setup_python_env_no_gui
+    echo "-----------------------------------------------------"
+    echo
+    echo "Ready to go!"
+    echo
+    echo "To start the program, activate the virtual environment by running:"
+    echo
+    echo "source $working_dir/.env/bin/activate"
+    echo
+    echo "Then run the program by running:"
+    echo
+    echo "python3 ${working_dir}/manage.py runserver"
+    echo
+    echo "-----------------------------------------------------"
+  else
+    setup_dependencies
+    echo "-----------------------------------------------------"
+    setup_python_env
+    echo "-----------------------------------------------------"
+    create_program_file
+    create_desktop_file
+    create_shortcut
+    echo "-----------------------------------------------------"
+    echo
+    echo "Ready to go!"
+    echo
+    echo "To start the program, run 'osmo-gui'"
+    echo
+    echo "-----------------------------------------------------"
+  fi
+
 }
 main
