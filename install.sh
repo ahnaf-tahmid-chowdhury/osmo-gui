@@ -99,17 +99,15 @@ setup_dependencies ()
   echo
   echo "Installing dependencies..."
   if [ "${os,,}" = "arch" ]; then
-    sudo pacman -S --noconfirm --needed build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev
-    echo "Depedencies installed on ${os}"
+    sudo pacman -S --noconfirm --needed build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv  libgirepository1.0-dev
   elif [ "${os,,}" = "centos" ] || [ "${os,,}" = "rhel" ]; then
     sudo yum -y -q install epel-release
-    sudo yum -y -q install build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev
-    echo "Depedencies installed on ${os}"
+    sudo yum -y -q install build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv libgirepository1.0-dev
   elif [ "${os,,}" = "debian" ] || [ "${os,,}" = "ubuntu" ]; then
-    sudo apt-get -y -qq install build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev
-    echo "Depedencies installed on ${os}"
+    sudo apt-get -y install build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv libgirepository1.0-dev
   else
     echo "Dependencies cannot be installed on ${os}"
+    exit 1
   fi
   echo
 }
@@ -126,6 +124,24 @@ setup_python_env () {
   python3 -m pip install -r $working_dir/requirements.txt
   echo "Python virtual env created."
 }
+
+setup_dependencies_no_gui () {
+  echo
+  echo "Installing dependencies..."
+  if [ "${os,,}" = "arch" ]; then
+    sudo pacman -S --noconfirm --needed python3-venv
+  elif [ "${os,,}" = "centos" ] || [ "${os,,}" = "rhel" ]; then
+    sudo yum -y -q install epel-release
+    sudo yum -y -q install  python3-venv
+  elif [ "${os,,}" = "debian" ] || [ "${os,,}" = "ubuntu" ]; then
+    sudo apt-get -y -qq install  python3-venv
+  else
+    echo "Dependencies cannot be installed on ${os}"
+    exit 1
+  fi
+  echo
+}
+
 setup_python_env_no_gui () {
   echo
   if [ -d "${working_dir}/.env" ]; then
@@ -135,7 +151,7 @@ setup_python_env_no_gui () {
   echo "Creating Python virtual env in ${working_dir}/.env"
   /usr/bin/python3 -m venv $working_dir/.env
   source $working_dir/.env/bin/activate
-  python3 -m pip install django 
+  python3 -m pip install django==4.1
   echo "Python virtual env created."
 }
 
@@ -227,8 +243,10 @@ main ()
   echo "Press enter to continue or ctrl+c to exit."
   read -r
   get_sudo_password
-  if [ $arguments = "--no-gui" ]; then
+  if [ $arguments = "--no-gui" ] > /dev/null 2>&1; then
     echo "Installing without GUI..."
+    setup_dependencies_no_gui
+    echo "-----------------------------------------------------"
     setup_python_env_no_gui
     echo "-----------------------------------------------------"
     echo
