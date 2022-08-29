@@ -1,0 +1,49 @@
+name: osmocom
+version: 1.0.0
+summary: A graphical user interface for the Osmocom project
+description: |
+  This is the graphical user interface for the Osmocom project.
+  This program is developed with Django framework. 
+  It is a web application that allows to manage the Osmocom network.
+  However, it is not a complete web application.
+confinement: devmode
+base: core22
+grade: devel
+
+parts:
+  osmocom:
+    plugin: dump
+    source: .
+    build-packages:
+      - gcc
+      - pkg-config
+      - python3-dev
+      - python3-venv
+      - build-essential
+      - libxml2-dev
+      - libcurl4-openssl-dev
+      - libicu-dev
+
+    override-build: |
+      snapcraftctl build
+      rm -rf $SNAPCRAFT_PART_INSTALL/snapcraft.yaml
+      rm -rf $SNAPCRAFT_PART_INSTALL/README.md
+      rm -rf $SNAPCRAFT_PART_INSTALL/install.sh
+      rm -rf $SNAPCRAFT_PART_INSTALL/.gitignore
+      rm -rf $SNAPCRAFT_PART_INSTALL/.git
+      rm -rf $SNAPCRAFT_PART_INSTALL/.github
+      mv $SNAPCRAFT_PART_INSTALL/gui $SNAPCRAFT_PART_INSTALL/run-program
+      chmod +x $SNAPCRAFT_PART_INSTALL/run-program
+      python3 -m venv $SNAPCRAFT_PART_INSTALL/env
+      source $SNAPCRAFT_PART_INSTALL/env/bin/activate
+      pip3 install -U pip django PyGObject pycairo pywebview
+
+    stage-packages:
+      - gir1.2-gtk-3.0
+      - gir1.2-appindicator3-0.1
+      - gir1.2-webkit2-4.0
+
+apps:
+  osmocom:
+    command: run-program
+    plugs: [network, x11]
