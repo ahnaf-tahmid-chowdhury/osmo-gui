@@ -1,0 +1,73 @@
+name: osmocom
+version: 1.0.0
+summary: A graphical user interface for the Osmocom project
+description: |
+  This is the graphical user interface for the Osmocom project.
+  This program is developed with Django framework. 
+  It is a web application that allows to manage the Osmocom network.
+  However, it is not a complete web application.
+confinement: devmode
+base: core22
+grade: stable
+
+parts:
+  osmocom:
+    plugin: python
+    source: .
+
+    build-packages:
+      - gcc # GNU Compiler Collection
+      - pkg-config # manage compile and link flags for libraries
+      - python3-dev # header files and a static library for Python (default)
+      - build-essential # Informational list of build-essential packages
+      - libxml2-dev # Development files for the GNOME XML library
+      - libcurl4-openssl-dev # Development files and documentation for libcurl (OpenSSL flavour)
+      - libicu-dev # Development files for International Components for Unicode
+
+    stage-packages:
+      - gir1.2-gtk-3.0 # GTK+ graphical user interface library (runtime files)
+      - gir1.2-webkit2-4.0 # WebKitGTK+ Web content engine library (runtime files)
+      - gobject-introspection # Generate interface introspection data for GObject libraries
+      - xapp # Xfce Application Library
+      - libcanberra-gtk3-module # GTK+ 3.0 module for playing event sounds
+      - libgl1-mesa-dri # free implementation of the OpenGL API -- DRI modules
+      - libgl1-mesa-glx # free implementation of the OpenGL API -- GLX runtime
+      - glib-networking # Network-related giomodules for GLib
+
+    python-packages:
+      - django # The Web framework for perfectionists with deadlines.
+      - pywebview # A lightweight cross-platform native wrapper around a webview component
+      - pycairo # Python bindings for the cairo graphics library
+      - pygobject # Python bindings for GObject
+
+    override-build: |
+      mkdir -p $SNAPCRAFT_PART_INSTALL/osmo-gui
+      cp -r * $SNAPCRAFT_PART_INSTALL/osmo-gui
+      mv $SNAPCRAFT_PART_INSTALL/osmo-gui/snap/local/run-program $SNAPCRAFT_PART_INSTALL/run-program
+      chmod +x $SNAPCRAFT_PART_INSTALL/run-program
+      rm -rf $SNAPCRAFT_PART_INSTALL/osmo-gui/snap
+      rm -rf $SNAPCRAFT_PART_INSTALL/osmo-gui/snapcraft.yaml
+      rm -rf $SNAPCRAFT_PART_INSTALL/osmo-gui/.git
+      rm -rf $SNAPCRAFT_PART_INSTALL/osmo-gui/.gitignore
+      snapcraftctl build
+
+layout:
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/webkit2gtk-4.0
+  /usr/lib/dri:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri
+  /usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gio/modules:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gio/modules
+  /usr/share/glib-2.0/schemas:
+    bind: $SNAP/usr/share/glib-2.0/schemas
+
+apps:
+  osmocom:
+    command: run-program
+    plugs: [network, x11, desktop, unity7, gsettings]
+    environment:
+      GI_TYPELIB_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/girepository-1.0
+      GTK_PATH: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/gtk-3.0
+      GTK_EXE_PREFIX: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET
+      GTK_DATA_PREFIX: $SNAP/usr/share
+      LC_ALL: C.UTF-8

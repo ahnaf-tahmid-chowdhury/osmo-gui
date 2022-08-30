@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Name=Osmocom
+Comment=Open source mobile communications
+Exec=osmocom
+Icon=${SNAP}/meta/gui/osmocom.png
+Type=Application
+Categories=HamRadio;Science;
+Keywords=SDR;Radio;HAM;RF;
+MimeType=application/gnuradio-grc;
+Terminal=false
