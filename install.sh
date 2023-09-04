@@ -2,8 +2,7 @@
 
 arguments=$@
 
-unknown_os ()
-{
+unknown_os() {
   echo "Unfortunately, your operating system distribution and version are not supported by this script."
   echo
   echo "You can override the OS detection by setting os= and dist= prior to running this script."
@@ -13,9 +12,8 @@ unknown_os ()
   exit 1
 }
 
-detect_os ()
-{
-  if [[ ( -z "${os}" ) && ( -z "${dist}" ) ]]; then
+detect_os() {
+  if [[ (-z "${os}") && (-z "${dist}") ]]; then
     # some systems dont have lsb-release yet have the lsb_release binary and
     # vice-versa
     if [ -e /etc/lsb-release ]; then
@@ -23,7 +21,7 @@ detect_os ()
 
       if [ "${ID}" = "raspbian" ]; then
         os=${ID}
-        dist=`cut --delimiter='.' -f1 /etc/debian_version`
+        dist=$(cut --delimiter='.' -f1 /etc/debian_version)
       else
         os=${DISTRIB_ID}
         dist=${DISTRIB_CODENAME}
@@ -33,18 +31,18 @@ detect_os ()
         fi
       fi
 
-    elif [ `which lsb_release 2>/dev/null` ]; then
-      dist=`lsb_release -c | cut -f2`
-      os=`lsb_release -i | cut -f2 | awk '{ print tolower($1) }'`
+    elif [ $(which lsb_release 2>/dev/null) ]; then
+      dist=$(lsb_release -c | cut -f2)
+      os=$(lsb_release -i | cut -f2 | awk '{ print tolower($1) }')
 
     elif [ -e /etc/debian_version ]; then
       # some Debians have jessie/sid in their /etc/debian_version
       # while others have '6.0.7'
-      os=`cat /etc/issue | head -1 | awk '{ print tolower($1) }'`
+      os=$(cat /etc/issue | head -1 | awk '{ print tolower($1) }')
       if grep -q '/' /etc/debian_version; then
-        dist=`cut --delimiter='/' -f1 /etc/debian_version`
+        dist=$(cut --delimiter='/' -f1 /etc/debian_version)
       else
-        dist=`cut --delimiter='.' -f1 /etc/debian_version`
+        dist=$(cut --delimiter='.' -f1 /etc/debian_version)
       fi
 
     else
@@ -57,13 +55,13 @@ detect_os ()
   fi
 
   # remove whitespace from OS and dist name
-  os="${os// /}" 
+  os="${os// /}"
   dist="${dist// /}"
 
   echo "Detected operating system as $os/$dist."
 }
 
-detect_version_id () {
+detect_version_id() {
   # detect version_id and round down float to integer
   if [ -f /etc/os-release ]; then
     . /etc/os-release
@@ -77,34 +75,34 @@ detect_version_id () {
 
   echo "Detected version id as $version_id"
 }
-set_working_dir ()
-{
+set_working_dir() {
   working_dir="$(cd -P "$(dirname -- "${BASH_SOURCE}")" >/dev/null 2>&1 && pwd)"
 
   echo "Working dir is $working_dir"
   echo
 }
 
-get_sudo_password ()
-{
+get_sudo_password() {
   # Ask for the administrator password upfront
   sudo -v
 
   # Keep-alive: update existing sudo time stamp until the script has finished
-  while true; do sudo -n true; sleep 60; kill -0 "$$" || exit; done 2>/dev/null &
+  while true; do
+    sudo -n true
+    sleep 60
+    kill -0 "$$" || exit
+  done 2>/dev/null &
 }
 
-setup_dependencies ()
-{
+setup_dependencies() {
   echo
   echo "Installing dependencies..."
   if [ "${os,,}" = "arch" ]; then
-    sudo pacman -S --noconfirm --needed build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv  libgirepository1.0-dev
+    sudo pacman -S --noconfirm --needed base-devel libxml2 cairo libxslt curl lib32-libcurl-compat python-virtualenv gobject-introspection
   elif [ "${os,,}" = "centos" ] || [ "${os,,}" = "rhel" ]; then
-    sudo yum -y -q install epel-release
-    sudo yum -y -q install build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv libgirepository1.0-dev
+    sudo dnf install -y gcc gcc-c++ make libxml2-devel cairo-devel libxslt-devel libcurl-devel libicu-devel python3-venv gobject-introspection-devel
   elif [ "${os,,}" = "debian" ] || [ "${os,,}" = "ubuntu" ]; then
-    sudo apt-get -y install build-essential libxml2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv libgirepository1.0-dev
+    sudo apt-get -y install build-essential libxml2-dev libcairo2-dev libxslt-dev libcurl4-openssl-dev libicu-dev python3-venv libgirepository1.0-dev
   else
     echo "Dependencies cannot be installed on ${os}"
     exit 1
@@ -112,7 +110,7 @@ setup_dependencies ()
   echo
 }
 
-setup_python_env () {
+setup_python_env() {
   echo
   if [ -d "${working_dir}/.env" ]; then
     echo "Virtual environment already exists. Deleting..."
@@ -125,16 +123,16 @@ setup_python_env () {
   echo "Python virtual env created."
 }
 
-setup_dependencies_no_gui () {
+setup_dependencies_no_gui() {
   echo
   echo "Installing dependencies..."
   if [ "${os,,}" = "arch" ]; then
     sudo pacman -S --noconfirm --needed python3-venv
   elif [ "${os,,}" = "centos" ] || [ "${os,,}" = "rhel" ]; then
     sudo yum -y -q install epel-release
-    sudo yum -y -q install  python3-venv
+    sudo yum -y -q install python3-venv
   elif [ "${os,,}" = "debian" ] || [ "${os,,}" = "ubuntu" ]; then
-    sudo apt-get -y -qq install  python3-venv
+    sudo apt-get -y -qq install python3-venv
   else
     echo "Dependencies cannot be installed on ${os}"
     exit 1
@@ -142,7 +140,7 @@ setup_dependencies_no_gui () {
   echo
 }
 
-setup_python_env_no_gui () {
+setup_python_env_no_gui() {
   echo
   if [ -d "${working_dir}/.env" ]; then
     echo "Virtual environment already exists. Deleting..."
@@ -155,15 +153,14 @@ setup_python_env_no_gui () {
   echo "Python virtual env created."
 }
 
-create_desktop_file ()
-{
+create_desktop_file() {
   echo
   if [ -f "/usr/share/applications/osmo-gui.desktop" ]; then
     echo "Desktop file already exists. Deleting..."
     sudo rm -f "/usr/share/applications/osmo-gui.desktop"
   fi
   echo "Creating desktop file..."
-  sudo cat > $working_dir/osmo-gui.desktop << EOF
+  sudo cat >$working_dir/osmo-gui.desktop <<EOF
 [Desktop Entry]
 Version=1.0
 Name=Osmocom
@@ -183,14 +180,13 @@ EOF
   echo "Desktop file created."
 }
 
-create_program_file ()
-{
+create_program_file() {
   echo
   echo "Creating program..."
   if [ -f "${working_dir}/osmo-gui" ]; then
     rm "${working_dir}/osmo-gui"
   fi
-  cat > ${working_dir}/osmo-gui << EOF
+  cat >${working_dir}/osmo-gui <<EOF
 #!${working_dir}/.env/bin/python3
 import webview
 import subprocess
@@ -218,20 +214,18 @@ EOF
   echo "osmo-gui created."
 }
 
-create_shortcut ()
-{
+create_shortcut() {
   echo "Creating shortcut..."
   if [ -f "/usr/bin/osmo-gui" ]; then
     echo "Shortcut already exists. Deleting..."
-    sudo rm -rf "/usr/bin/osmo-gui" 
+    sudo rm -rf "/usr/bin/osmo-gui"
     echo "Creating new shortcut..."
   fi
   sudo ln -s ${working_dir}/osmo-gui /usr/bin/osmo-gui
   echo "Shortcut created."
 }
 
-main ()
-{
+main() {
   detect_os
   detect_version_id
   set_working_dir
@@ -243,7 +237,7 @@ main ()
   echo "Press enter to continue or ctrl+c to exit."
   read -r
   get_sudo_password
-  if [ $arguments = "--no-gui" ] > /dev/null 2>&1; then
+  if [ $arguments = "--no-gui" ] >/dev/null 2>&1; then
     echo "Installing without GUI..."
     setup_dependencies_no_gui
     echo "-----------------------------------------------------"
